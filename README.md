@@ -69,20 +69,15 @@ pip install -r requirements.txt
 ```
 
 ### 2.3 Set environment variables (for local dev)
-Create a file called `.env.bat` in the project root:
+Local development uses SQLite by default, so you can run the app and test `admin` / `pass` without connecting to Azure SQL.
+
+Optional: create a file called `.env.bat` in the project root:
 ```bat
 @echo off
 set SECRET_KEY=dev-secret-key-change-me
-set SQL_SERVER=cms.database.windows.net
-set SQL_DATABASE=cms
-set SQL_USER_NAME=cmsadmin
-set SQL_PASSWORD=CMS4dmin
-set BLOB_ACCOUNT=images11
-set BLOB_CONTAINER=images
-set BLOB_STORAGE_KEY=<YOUR_BLOB_STORAGE_KEY>
-set BLOB_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=images11;AccountKey=<YOUR_BLOB_STORAGE_KEY>;EndpointSuffix=core.windows.net
-set CLIENT_ID=1660e7a3-74ae-4945-aea0-5bd962871c33
-set CLIENT_SECRET=<YOUR_CLIENT_SECRET>
+set DATABASE_BACKEND=sqlite
+set SQLITE_DATABASE=cms_local.db
+set IMAGE_UPLOAD_BACKEND=local
 ```
 
 Run it before starting the app:
@@ -126,7 +121,21 @@ Login: `admin` / `pass`
    - Name: `udacitycms` (or any unique name)
    - Runtime: Python 3.10
    - Plan: Free F1
-2. Go to **Settings → Environment Variables** and add all variables from Step 2.3
+2. Go to **Settings -> Environment Variables** and add these production settings:
+   - `DATABASE_BACKEND=sqlserver`
+   - `SQL_SERVER=<your-server-name>.database.windows.net`
+   - `SQL_DATABASE=<your-database-name>`
+   - `SQL_USER_NAME=<your-sql-admin-user>`
+   - `SQL_PASSWORD=<your-sql-admin-password>`
+   - `SQL_DRIVER=ODBC Driver 17 for SQL Server`
+   - `SQL_TRUST_SERVER_CERTIFICATE=no`
+   - `IMAGE_UPLOAD_BACKEND=blob`
+   - `BLOB_ACCOUNT=<your-storage-account>`
+   - `BLOB_CONTAINER=images`
+   - `BLOB_STORAGE_KEY=<your-storage-key>`
+   - `BLOB_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=<your-storage-account>;AccountKey=<your-storage-key>;EndpointSuffix=core.windows.net`
+   - `CLIENT_ID=<your-entra-app-client-id>`
+   - `CLIENT_SECRET=<your-entra-client-secret>`
 3. Go to **Deployment Center**:
    - Source: GitHub
    - Select your repo and branch

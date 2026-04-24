@@ -23,4 +23,8 @@ def create_app():
     from app.views import main
     app.register_blueprint(main)
 
+    with app.app_context():
+        from app.models import init_db
+        init_db()
+
     return app

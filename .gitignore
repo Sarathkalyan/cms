@@ -4,4 +4,6 @@ __pycache__/
 .env.bat
 cms_app.log
 .python-version
+*.db
+app/static/uploads/
 

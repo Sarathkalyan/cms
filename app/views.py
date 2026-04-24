@@ -7,7 +7,9 @@ from app.models import (
     update_article, delete_article, get_user
 )
 from azure.storage.blob import BlobServiceClient
+from werkzeug.utils import secure_filename
 import msal
+import os
 import uuid
 import logging
 
@@ -38,6 +40,28 @@ def _build_msal_app():
 # ── Blob helper ───────────────────────────────────────────────────────────────
 
 def upload_image(image_file):
+    """Upload image to local static storage or Azure Blob Storage and return a URL."""
+    if current_app.config['IMAGE_UPLOAD_BACKEND'] == 'local':
+        return upload_local_image(image_file)
+
+    return upload_blob_image(image_file)
+
+
+def upload_local_image(image_file):
+    filename = secure_filename(image_file.filename)
+    if not filename:
+        return ''
+
+    filename = f"{uuid.uuid4().hex}_{filename}"
+    upload_folder = current_app.config['LOCAL_UPLOAD_FOLDER']
+    upload_path = os.path.join(current_app.static_folder, upload_folder)
+    os.makedirs(upload_path, exist_ok=True)
+
+    image_file.save(os.path.join(upload_path, filename))
+    return url_for('static', filename=f"{upload_folder}/{filename}")
+
+
+def upload_blob_image(image_file):
     """Upload image to Azure Blob Storage and return public URL."""
     blob_service = BlobServiceClient.from_connection_string(
         current_app.config['BLOB_CONNECTION_STRING']
@@ -45,10 +69,35 @@ def upload_image(image_file):
     container_client = blob_service.get_container_client(
         current_app.config['BLOB_CONTAINER']
     )
-    blob_name = image_file.filename
+    blob_name = f"{uuid.uuid4().hex}_{secure_filename(image_file.filename)}"
     blob_client = container_client.get_blob_client(blob_name)
     blob_client.upload_blob(image_file, overwrite=True)
     return blob_client.url
+
+
+def delete_image(image_url):
+    """Delete a local image or blob by URL (best-effort)."""
+    static_prefix = url_for('static', filename='', _external=False)
+    if image_url.startswith(static_prefix):
+        delete_local_image(image_url)
+    else:
+        delete_blob(image_url)
+
+
+def delete_local_image(image_url):
+    try:
+        static_prefix = url_for('static', filename='', _external=False)
+        relative_path = image_url.split(static_prefix, 1)[-1]
+        upload_folder = current_app.config['LOCAL_UPLOAD_FOLDER']
+        if not relative_path.startswith(f"{upload_folder}/"):
+            return
+
+        file_path = os.path.abspath(os.path.join(current_app.static_folder, relative_path))
+        static_folder = os.path.abspath(current_app.static_folder)
+        if os.path.commonpath([static_folder, file_path]) == static_folder and os.path.exists(file_path):
+            os.remove(file_path)
+    except Exception as e:
+        logger.warning(f"Could not delete local image: {e}")
 
 
 def delete_blob(image_url):
@@ -218,7 +267,7 @@ def delete(article_id):
     article = get_article(article_id)
     if article:
         if article[4]:
-            delete_blob(article[4])
+            delete_image(article[4])
         delete_article(article_id)
         logger.info(f"Article {article_id} deleted by {session['user']['username']}")
         flash('Article deleted.', 'info')

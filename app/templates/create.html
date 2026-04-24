@@ -27,7 +27,13 @@
         <div class="mb-4">
           <label class="form-label fw-semibold">Image (optional)</label>
           <input type="file" name="image" class="form-control" accept="image/*"/>
-          <div class="form-text">Uploaded to Azure Blob Storage.</div>
+          <div class="form-text">
+            {% if config.IMAGE_UPLOAD_BACKEND == 'local' %}
+              Uploaded to local storage.
+            {% else %}
+              Uploaded to Azure Blob Storage.
+            {% endif %}
+          </div>
         </div>
         <div class="d-flex gap-2">
           <button type="submit" class="btn btn-primary">
