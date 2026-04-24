@@ -5,11 +5,11 @@ from flask import current_app
 def get_connection():
     conn_str = (
         "DRIVER={ODBC Driver 17 for SQL Server};"
-        f"SERVER={current_app.config['SQL_SERVER']};"
+        f"SERVER=tcp:{current_app.config['SQL_SERVER']},1433;"
         f"DATABASE={current_app.config['SQL_DATABASE']};"
         f"UID={current_app.config['SQL_USER_NAME']};"
         f"PWD={current_app.config['SQL_PASSWORD']};"
-        "Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+        "Encrypt=yes;TrustServerCertificate=yes;Connect Timeout=30;"
     )
     return pyodbc.connect(conn_str)
 
