@@ -56,11 +56,15 @@ jobs:
           name: python-app
           path: .
 
+      - name: 'Azure Login'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'cmswebapp22'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CMSWEBAPP22 }}
           package: .
