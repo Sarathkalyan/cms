@@ -139,14 +139,12 @@ Login: `admin` / `pass`
 3. Go to **Deployment Center**:
    - Source: GitHub
    - Select your repo and branch
-4. **Take a screenshot** of the running app (URL visible + "Article CMS" header)
 
 ### 3.5 Microsoft Entra ID (OAuth2)
 1. Go to **Microsoft Entra ID → App Registrations → cmsEntraID**
 2. Click **Authentication → Add a Platform → Web**
 3. Redirect URI: `https://udacitycms.azurewebsites.net/getAToken`
 4. Logout URL: `https://udacitycms.azurewebsites.net/login`
-5. **Take a screenshot** of the Redirect URIs page
 
 ---
 
@@ -165,16 +163,6 @@ Log format:
 To view logs in Azure App Service:
 - Go to **Monitoring → Log Stream** in the Azure Portal
 - Or download from **Monitoring → App Service Logs**
-
-**Screenshot checklist for submission:**
-- [ ] Resource Group with all services visible
-- [ ] SQL Database – both tables created (Query Editor)
-- [ ] Storage Account – blob endpoint URL visible in Properties
-- [ ] Running app in browser (URL + "Article CMS" header)
-- [ ] App with at least one article (title, author, body, image)
-- [ ] Redirect URIs in App Registration
-- [ ] Logs showing successful AND failed login
-
 ---
 
 ## Troubleshooting (Windows)
